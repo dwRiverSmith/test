@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AL Index</title>
+<script src="../scripts/js-year-calendar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://unpkg.com/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-171803741-2"></script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M4KDJRT');</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-171803741-2');
+</script>
+<script src='../scripts/sql-wasm.js'></script>
+<script src='../scripts/d3.v7.min.js'></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="../styles/js-year-calendar.css" />
+<link rel="stylesheet" type="text/css" href="../styles/style.css" />
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M4KDJRT"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<ul class="fixed-btn" id="feature">
+	    <li>
+	        <input type="text" onkeydown="jump('update-current-year')" id="current-year" style="margin: 10px; width: 100px"  placeholder="Year">
+	        <button id="update-current-year" type="button" style="margin-right: 10px;">Jump to</button>
+	        <button id="TrProgress" type="button" style="margin-left: 10px;margin-right: 10px;">Show coverage</button>
+	    </li>
+	    <li><a href="https://github.com/JiangJY-713/AL_Index#indexing-anne-listers-journal" target="_blank">Read me</a></li>
+	    <li><a id="update_log" href="https://github.com/JiangJY-713/AL_Index/commits/main" target="_blank">Update log</a></li>
+	    <li><a id="souce_list" href="https://www.packedwithpotential.org/resources/anne-lister-diary-transcripts" target="_blank">Source list</a></li>
+	</ul>
+	<div id="placeholder" style="height:60px"></div>
+	<div style="position: fixed; right: 0;top:0%;height: 100%">
+		<!-- <div class="loading-mask" style="left: -410px; height: 100%;background-color: rgba(0,0,0,0.08);"> -->
+		<div class="loading-mask" style="left: -410px; height: 100%;background-color: rgba(0,0,0,0.08);">
+			<div class="progress" style="background-color: white; width:calc(100% - 10px);height: 5px;position: absolute;">
+			  <div class="progress-bar" role="progressbar"  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="position: relative;"></div>
+			</div>
+		</div>
+		<div id="searchNav" class="sidenav">
+			<span class="close" onclick="closeNav()" style="cursor: pointer;"></span>
+			<form id="search" method="get" class="search-form" action="">
+				<label style="margin-bottom: 0px">
+					<input type="search" name="keyword" class="search-field" id ="search-field"
+                placeholder="Search" onclick="openNav()">
+				</label>
+				<select name="search-mode" id="search-mode" style="display: none;">
+				    <option value="match">full text search</option>
+				    <option value="match_exact">fts (exact words)</option>
+				    <option value="like">pattern match</option>
+				</select>
+				<input type="submit" class="search-submit" value="Search">
+				<div id="search-options" style="display: none">
+					<div id="advanced-search" style="display: none">
+						 <p style="margin: 0">
+						 	<b>Entry type:</b>
+						    <input type="checkbox" checked="true" id="entry_type_0" name="entry_type" value="0">
+						    <label for="entry_type_0">journal</label>
+						    <input type="checkbox" checked="true" id="entry_type_1" name="entry_type" value="1">
+						    <label for="entry_type_1">travel notes</label>
+						    <input type="checkbox" checked="true" id="entry_type_2" name="entry_type" value="2">
+						    <label for="entry_type_2">AW's journal</label>
+						    <br>&emsp;&emsp;
+						    <input type="checkbox" checked="true" id="entry_type_3" name="entry_type" value="3">
+						    <label for="entry_type_3">journal index</label>
+						    <input type="checkbox" checked="true" id="entry_type_4" name="entry_type" value="4">
+						    <label for="entry_type_4">travel accounts</label>
+						    <input type="checkbox" checked="true" id="entry_type_5" name="entry_type" value="5">
+						    <label for="entry_type_5">itinerary</label>
+						  </p>
+						  <p style="margin: 0">
+						 	<b>Source:</b> 
+						    <input type="checkbox" checked="true" id="source_1" name="source" value="WYAS">
+						    <label for="source_1">WYAS</label>
+						    <input type="checkbox" checked="true" id="source_2" name="source" value="ALCB blogs">
+						    <label for="source_2">ALCB blogs</label><br>
+						  </p>
+					</div>
+					<div id="search-options-btn" style="margin-right:5px;float: right; cursor: pointer; color: blue;" onclick="SearchOpt()">Search Options</div>
+					<div id="search-tips-btn" style="float: left; cursor: pointer; color: blue;" onclick="window.open('https://github.com/JiangJY-713/AL_Index#full-text-search')">Search Tips</div>
+				</div>
+			</form>
+			<div id="search-result" style="margin-top: 60px">
+				<div id="wrapper">
+				</div>
+				<div>
+				<div id="fts-abstract">
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+	<div id="calendar-main">		
+	    <div id="legend">
+	        <img src="../img/legend.jpg" width="787px" height="130px">
+	    </div>
+	    <div id="calendar"></div>    
+	</div>
+<!-- <script src='../scripts/dist/fts_sqlite3_bundle.js'></script> -->
+<script src='../scripts/fts_sqlite3.js'></script>
+<script src='../scripts/main_viewer_fts.js'></script>
+</body>
+</html>
